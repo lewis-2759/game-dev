@@ -119,12 +119,6 @@ void Game::initMaterials()
 
 }
 
-void Game::initOBJModels()
-{
-   // std::vector<Vertex> temp;
-   // temp = loadOBJ("resource/ddh.obj");
-}
-
 void Game::initModels()
 {
     std::vector<Mesh*>meshes;
@@ -161,14 +155,14 @@ void Game::initModels()
             this->textures[TEX_COLOR_SPECULAR],
             meshes));
 
-
-    this->models.push_back(
-        //model position in vector here
-        new Model(glm::vec3(4.f, -0.5f, 4.f),
-            this->materials[MAT_1],
-            this->textures[TEX_COLOR],
-            this->textures[TEX_COLOR_SPECULAR],
-            "resource/cat.obj"));
+    //for objloader
+    //this->models.push_back(
+    //    //model position in vector here
+    //    new Model(glm::vec3(4.f, -0.5f, 4.f),
+    //        this->materials[MAT_1],
+    //        this->textures[TEX_COLOR],
+    //        this->textures[TEX_COLOR_SPECULAR],
+    //        "resource/cat.obj"));
 
     //destroy after mesh giving to model
     for (auto*& i : meshes) {
@@ -250,6 +244,8 @@ Game::Game(const char* title, const int  WINDOW_WIDTH, const int WINDOW_HEIGHT, 
     this->mouseOffsetY = 0.0;
     this->firstMouse = true;
 
+    this->shiftHold = false;
+
     this->OrthoMatrix = glm::ortho(0.0f, float(this->WINDOW_WIDTH), 0.0f, float(WINDOW_HEIGHT));
 
     this->initGLFW();
@@ -260,7 +256,6 @@ Game::Game(const char* title, const int  WINDOW_WIDTH, const int WINDOW_HEIGHT, 
     this->initShaders();
     this->initTextures();
     this->initMaterials();
-    this->initOBJModels();
     this->initModels();
     this->initLights();
     this->initUniforms();
@@ -349,6 +344,18 @@ void Game::updateKeyboardInput()
     }
     if (glfwGetKey(this->window, GLFW_KEY_LEFT_CONTROL) == GLFW_PRESS) {
         this->camera.move(this->dt, DOWN);
+    }
+    if (glfwGetKey(this->window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS) {
+        this->shiftHold = true;
+    }
+    if (glfwGetKey(this->window, GLFW_KEY_LEFT_SHIFT) == GLFW_RELEASE) {
+        this->shiftHold = false;
+    }
+    if (shiftHold) {
+        this->camera.setSpeed(7.0f);
+    }
+    if (!shiftHold) {
+        this->camera.setSpeed(3.0f);
     }
 }
 

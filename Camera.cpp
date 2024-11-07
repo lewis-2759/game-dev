@@ -111,3 +111,8 @@ void Camera::move(const float& dt, const int direction)
 		break;
 	}
 }
+
+void Camera::setSpeed(GLfloat speed)
+{
+	this->movementSpeed = speed;
+}

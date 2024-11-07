@@ -52,6 +52,8 @@ private:
 	double mouseOffsetY;
 	bool firstMouse;
 
+	bool shiftHold;
+
 	//matricies
 	glm::mat4 ViewMatrix;
 	glm::vec3 camPosition;
@@ -91,7 +93,6 @@ private:
 	void initShaders();
 	void initTextures();
 	void initMaterials();
-	void initOBJModels();
 	void initModels();
 	void initLights();
 	void initUniforms();

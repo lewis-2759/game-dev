@@ -50,4 +50,6 @@ public:
 
 	void move(const float& dt, const int direction);
 
+	void setSpeed(GLfloat speed);
+
 };
