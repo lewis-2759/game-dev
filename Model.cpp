@@ -21,6 +21,27 @@ Model::Model(glm::vec3 position, Material* material, Texture* Odif, Texture* Osp
 	}
 }
 
+Model::Model(glm::vec3 position, Material* material, Texture* Odif, Texture* Ospec, const char* fileName)
+{
+
+	this->position = position;
+	this->material = material;
+	this->overrideTextureDiffuse = Odif;
+	this->overrideTextureSpecular = Ospec;
+
+	std::vector<Vertex> mesh = loadOBJ(fileName);
+	this->meshes.push_back(new Mesh(mesh.data(), mesh.size(), NULL, 0, glm::vec3(1.f, 0.f, 0.f),
+		glm::vec3(0.f),
+		glm::vec3(0.f),
+		glm::vec3(1.f)));
+
+	//move it to position given
+	for (auto& i : this->meshes) {
+		i->Move(this->position);
+		i->setOrigin(this->position);
+	}
+}
+
 Model::~Model()
 {
 	//delete all meshes

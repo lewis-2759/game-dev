@@ -3,7 +3,7 @@
 
 //ENUMERATIONS
 enum shader_enum {
-	SHADER_CORE_PROGRAM = 0
+	SHADER_CORE_PROGRAM = 0, SHADER_2D_CORE =1 
 };
 enum texture_enum {
 	TEX_CAT = 0, TEX_CAT_SPECULAR, TEX_CONTAINER, TEX_CONTAINER_SPECULAR, TEX_COLOR, TEX_COLOR_SPECULAR
@@ -33,6 +33,13 @@ private:
 	float curTime;
 	float lastTime;
 
+	//fps
+
+	float lastFrameTimeFPS;
+	int FPS;
+	int nextFPS;
+
+
 	//camera
 	Camera camera;
 
@@ -55,6 +62,9 @@ private:
 	float fov;
 	float nearPlane;
 	float farPlane;
+
+	//orthomatrix for hud
+	glm::mat4 OrthoMatrix;
 
 	//shaders
 	std::vector<Shader*> shaders;
@@ -81,6 +91,7 @@ private:
 	void initShaders();
 	void initTextures();
 	void initMaterials();
+	void initOBJModels();
 	void initModels();
 	void initLights();
 	void initUniforms();
@@ -95,6 +106,8 @@ public:
 
 	//accessor
 	int getWindowShouldClose();
+
+	int getFPS();
 
 	//modifiers
 	void setWindowShouldClose();

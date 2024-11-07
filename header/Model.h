@@ -6,6 +6,7 @@
 #include "Texture.h"
 #include "Shader.h"
 #include "Material.h"
+#include "OBJLoader.h"
 
 class Model {
 private:
@@ -20,6 +21,7 @@ private:
 public:
 
 	Model(glm::vec3 position, Material* material, Texture* Odif, Texture* Ospec, std::vector<Mesh*> meshes);
+	Model(glm::vec3 position, Material* material, Texture* Odif, Texture* Ospec, const char* fileName);
 	~Model();
 
 	void rotate(const glm::vec3 rotation);

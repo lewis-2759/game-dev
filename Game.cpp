@@ -16,6 +16,10 @@ void Game::initWindow(const char* title, bool resizable) {
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, this->GL_VERSION_MINOR);
     glfwWindowHint(GLFW_RESIZABLE, resizable); //2nd true for resizable
 
+    //this syncronizes the frames to reduce tearing
+    //TODO make this a setting you can change
+    glfwSwapInterval(GL_TRUE);
+
     //for macos
     // glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT,GL_TRUE);
     //fourth one is fullscreen parameter (2nd to last NULL)
@@ -27,9 +31,12 @@ void Game::initWindow(const char* title, bool resizable) {
     }
 
     //setting framebuffer height and width for when we change it
+    static GLuint checkH= framebufferHeight;
+    static GLuint checkW = framebufferWidth;
     glfwGetFramebufferSize(this->window, &this->framebufferWidth, &this->framebufferHeight);
-    glfwSetFramebufferSizeCallback(this->window, Game::framebuffer_resize_callback);
-
+    if (checkH != this->framebufferHeight || checkW != this->framebufferWidth) {
+        glfwSetFramebufferSizeCallback(this->window, Game::framebuffer_resize_callback);
+    }
     //for constant frame size
     //glfwGetFramebufferSize(window, &framebufferWidth, &framebufferHeight);
     //glViewport(0, 0, framebufferWidth, framebufferHeight);
@@ -78,10 +85,17 @@ void Game::initMatricies()
 
 void Game::initShaders()
 {
+    //main program shader
     char* vertex = (char*)"vertex_core.glsl";
     char* fragment = (char*)"fragment_core.glsl";
     char* geometry = (char*)"";
     this->shaders.push_back(new Shader(this->GL_VERSION_MAJOR, this->GL_VERSION_MINOR, vertex, fragment, geometry));
+
+    //2D shader
+    char* vertex2D = (char*)"2D_vertex_core.glsl";
+    char* fragment2D = (char*)"2D_fragment_core.glsl";
+    char* geometry2D = (char*)"";
+    this->shaders.push_back(new Shader(this->GL_VERSION_MAJOR, this->GL_VERSION_MINOR, vertex2D, fragment2D, geometry2D));
 }
 
 void Game::initTextures()
@@ -105,9 +119,16 @@ void Game::initMaterials()
 
 }
 
+void Game::initOBJModels()
+{
+   // std::vector<Vertex> temp;
+   // temp = loadOBJ("resource/ddh.obj");
+}
+
 void Game::initModels()
 {
     std::vector<Mesh*>meshes;
+
     meshes.push_back(
         new Mesh(new Pyramid(),
             //here can add offsets for rotation
@@ -139,6 +160,15 @@ void Game::initModels()
             this->textures[TEX_COLOR],
             this->textures[TEX_COLOR_SPECULAR],
             meshes));
+
+
+    this->models.push_back(
+        //model position in vector here
+        new Model(glm::vec3(4.f, -0.5f, 4.f),
+            this->materials[MAT_1],
+            this->textures[TEX_COLOR],
+            this->textures[TEX_COLOR_SPECULAR],
+            "resource/cat.obj"));
 
     //destroy after mesh giving to model
     for (auto*& i : meshes) {
@@ -207,6 +237,10 @@ Game::Game(const char* title, const int  WINDOW_WIDTH, const int WINDOW_HEIGHT, 
     this->curTime = 0.0f;
     this->lastTime = 0.0f;
 
+    this->lastFrameTimeFPS = 0.f;
+    this->FPS = 0;
+    this->nextFPS = 0;
+
     //time
     this->lastMouseX = 0.0;
     this->lastMouseY = 0.0;
@@ -216,6 +250,8 @@ Game::Game(const char* title, const int  WINDOW_WIDTH, const int WINDOW_HEIGHT, 
     this->mouseOffsetY = 0.0;
     this->firstMouse = true;
 
+    this->OrthoMatrix = glm::ortho(0.0f, float(this->WINDOW_WIDTH), 0.0f, float(WINDOW_HEIGHT));
+
     this->initGLFW();
 	this->initWindow(title, resizable);
     this->initGLEW();
@@ -224,6 +260,7 @@ Game::Game(const char* title, const int  WINDOW_WIDTH, const int WINDOW_HEIGHT, 
     this->initShaders();
     this->initTextures();
     this->initMaterials();
+    this->initOBJModels();
     this->initModels();
     this->initLights();
     this->initUniforms();
@@ -258,6 +295,11 @@ int Game::getWindowShouldClose()
     return glfwWindowShouldClose(this->window);
 }
 
+int Game::getFPS()
+{
+    return this->FPS;
+}
+
 //modifiers
 
 void Game::setWindowShouldClose()
@@ -272,6 +314,14 @@ void Game::updateDT()
     this->curTime = static_cast<float>(glfwGetTime());
     this->dt = this->curTime - this->lastTime;
     this->lastTime = this->curTime;
+    this->nextFPS++;
+
+    //set FPS if a second has passed
+    if (this->curTime - this->lastFrameTimeFPS > 1.0) {
+        this->lastFrameTimeFPS = this->curTime;
+        this->FPS = this->nextFPS;
+        this->nextFPS = 0;
+    }
 }
 
 void Game::updateKeyboardInput()
@@ -336,11 +386,10 @@ void Game::update()
     this->updateDT();
     this->updateInput();
 
-
-    this->models[0]->rotate(glm::vec3(0.f, 0.5f, 0.f));
-    this->models[1]->rotate(glm::vec3(0.f, 0.5f, 0.f));
-    this->models[2]->rotate(glm::vec3(0.f, 0.5f, 0.f));
-
+    //rotation for models 0, 1, 2
+    //this->models[0]->rotate(glm::vec3(0.f, 0.5f, 0.f));
+    //this->models[1]->rotate(glm::vec3(0.f, 0.5f, 0.f));
+    //this->models[2]->rotate(glm::vec3(0.f, 0.5f, 0.f));
 }
 
 void Game::render()
@@ -357,6 +406,7 @@ void Game::render()
     for (auto& i : this->models){
         i->render(this->shaders[SHADER_CORE_PROGRAM]);
     }
+    
 
     //end draw - back buffer is being drawn to while front buffer is showing on screen, we swap them, then flush the new back buffer
     glfwSwapBuffers(this->window);
