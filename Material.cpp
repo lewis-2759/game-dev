@@ -1,4 +1,5 @@
-#include "Material.h"
+#pragma once
+#include "libs.h"
 
 
 Material::Material(glm::vec3 ambient, glm::vec3 diffuse, glm::vec3 specular, GLint diffuseTex, GLint specularTex)

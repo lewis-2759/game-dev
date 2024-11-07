@@ -1,4 +1,5 @@
-#include "Texture.h"
+#pragma once
+#include "libs.h"
 
 GLuint Texture::getId() const
 {

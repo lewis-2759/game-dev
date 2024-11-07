@@ -1,5 +1,8 @@
+#pragma once
+
 #include "Mesh.h"
-#include "Mesh.h"
+
+#include "libs.h"
 
 void Mesh::initVAO()
 {

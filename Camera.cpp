@@ -1,4 +1,5 @@
-#include "Camera.h"
+#pragma once
+#include "libs.h"
 
 
 

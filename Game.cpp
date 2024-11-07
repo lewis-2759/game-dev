@@ -99,8 +99,8 @@ void Game::initTextures()
 }
 
 void Game::initMaterials()
-{
-   this->materials.push_back(new Material(glm::vec3(0.1f), glm::vec3(1.f), glm::vec3(1.f),
+{                                                         //setting specular and stuff here
+   this->materials.push_back(new Material(glm::vec3(0.1f), glm::vec3(1.f), glm::vec3(3.f),
        0,1)); //dont know about setting the textures here
 
 }

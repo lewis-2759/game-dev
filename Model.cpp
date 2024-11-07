@@ -51,11 +51,11 @@ void Model::render(Shader* shader)
 	//use a program
 	shader->use();
 
-	//bind textures, cat to 0, container to 1
-	this->overrideTextureDiffuse->bind(0);
-	this->overrideTextureSpecular->bind(1);
 	//draw
 	for (auto& i : this->meshes) {
+		//bind textures
+		this->overrideTextureDiffuse->bind(0);
+		this->overrideTextureSpecular->bind(1);
 		i->render(shader);
 	}
 }
